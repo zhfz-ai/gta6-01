@@ -1,53 +1,34 @@
-// Keyboard and pointer input. Held keys give a steering direction; one-shot presses (start or
-// restart, pause) are queued as bit flags and taken once by the loop, so a press between two
-// frames is never lost and never counted twice.
+// Input — one job: keyboard state, edge-triggered keys, nothing else.
+// Keys: WASD/arrows drive & walk, Shift run, Space handbrake, E enter/exit
+// car, F punch/shoot, R reload, T taxi, P/Esc pause, M mute.
 
-export const ACTION_CONFIRM = 1;
-export const ACTION_PAUSE = 2;
+const DOWN = new Set();
+const PRESSED = new Set();
 
-const LEFT = new Set(['ArrowLeft', 'KeyA']);
-const RIGHT = new Set(['ArrowRight', 'KeyD']);
-const CONFIRM = new Set(['Space', 'Enter']);
-const PAUSE = new Set(['KeyP', 'Escape']);
+export const input = {
+  // Continuous state, read every frame.
+  get up() { return DOWN.has('KeyW') || DOWN.has('ArrowUp'); },
+  get down() { return DOWN.has('KeyS') || DOWN.has('ArrowDown'); },
+  get left() { return DOWN.has('KeyA') || DOWN.has('ArrowLeft'); },
+  get right() { return DOWN.has('KeyD') || DOWN.has('ArrowRight'); },
+  get run() { return DOWN.has('ShiftLeft') || DOWN.has('ShiftRight'); },
+  get handbrake() { return DOWN.has('Space'); },
+  get anyKey() { return DOWN.size > 0; },
 
-export function createInput(target) {
-  let left = false;
-  let right = false;
-  let actions = 0;
+  // Edge-triggered: true once, consumed by the caller.
+  pressed(code) {
+    if (PRESSED.has(code)) { PRESSED.delete(code); return true; }
+    return false;
+  },
+  consumeAll() { PRESSED.clear(); },
+};
 
-  window.addEventListener('keydown', (event) => {
-    if (LEFT.has(event.code)) left = true;
-    else if (RIGHT.has(event.code)) right = true;
-    else if (CONFIRM.has(event.code)) {
-      if (!event.repeat) actions |= ACTION_CONFIRM;
-    } else if (PAUSE.has(event.code)) {
-      if (!event.repeat) actions |= ACTION_PAUSE;
-    } else return;
-    event.preventDefault();
+export function bindInput() {
+  window.addEventListener('keydown', (e) => {
+    if (e.code === 'Space') e.preventDefault();
+    if (!e.repeat) PRESSED.add(e.code);
+    DOWN.add(e.code);
   });
-  window.addEventListener('keyup', (event) => {
-    if (LEFT.has(event.code)) left = false;
-    else if (RIGHT.has(event.code)) right = false;
-  });
-  // A key released while the tab is hidden never sends keyup: let go of everything on blur.
-  window.addEventListener('blur', () => {
-    left = false;
-    right = false;
-  });
-  target.addEventListener('pointerdown', () => {
-    actions |= ACTION_CONFIRM;
-  });
-
-  return {
-    /** -1 for left, 1 for right, 0 for neither or both. */
-    direction() {
-      return (right ? 1 : 0) - (left ? 1 : 0);
-    },
-    /** The one-shot presses since the last call, as ACTION_* flags. */
-    takeActions() {
-      const taken = actions;
-      actions = 0;
-      return taken;
-    },
-  };
+  window.addEventListener('keyup', (e) => DOWN.delete(e.code));
+  window.addEventListener('blur', () => { DOWN.clear(); PRESSED.clear(); });
 }

@@ -1,19 +1,48 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Block Dodger</title>
+<link rel="icon" href="data:,">
+<title>Solmara: Sunset Heist</title>
 <style>
-  html, body { margin: 0; height: 100%; overflow: hidden; background: #11141b; }
-  #game { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
-  /* Read aloud, never shown: the status line screen readers announce. */
-  #status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #1a1210; font-family: 'Segoe UI', system-ui, sans-serif; }
+  #game, #game canvas { width: 100%; height: 100%; display: block; }
+  #ui { position: fixed; inset: 0; pointer-events: none; color: #fff; }
+  #hud { position: absolute; inset: 0; text-shadow: 0 1px 3px rgba(0,0,0,.8); }
+  #hud-tl { position: absolute; top: 14px; left: 16px; }
+  #health-wrap { width: 190px; height: 16px; background: rgba(0,0,0,.55); border: 1px solid #ffffff66; border-radius: 3px; position: relative; }
+  #health-bar { height: 100%; width: 100%; background: #4caf50; border-radius: 2px; }
+  #health-num { position: absolute; right: 6px; top: 0; font-size: 11px; line-height: 16px; font-weight: bold; }
+  #cash { font-size: 26px; font-weight: 800; color: #7dff8a; margin-top: 4px; }
+  #hud-tr { position: absolute; top: 12px; right: 16px; text-align: right; }
+  #stars { font-size: 24px; letter-spacing: 2px; }
+  #clock { font-size: 13px; opacity: .85; margin-top: 2px; }
+  #objective { position: absolute; left: 16px; bottom: 64px; font-size: 17px; font-weight: 600; background: rgba(0,0,0,.5); padding: 8px 12px; border-left: 4px solid #ff4fa3; border-radius: 3px; max-width: 560px; }
+  #mission-title { position: absolute; left: 16px; bottom: 118px; font-size: 13px; letter-spacing: 2px; color: #ffd54a; font-weight: 700; }
+  #speedo { position: absolute; right: 18px; bottom: 64px; font-size: 34px; font-weight: 800; }
+  #speedo span { font-size: 14px; font-weight: 400; }
+  #ammo { position: absolute; right: 18px; bottom: 118px; font-size: 13px; opacity: .9; }
+  #message { position: absolute; left: 50%; top: 22%; transform: translateX(-50%); font-size: 20px; font-weight: 700; background: rgba(0,0,0,.55); padding: 10px 18px; border-radius: 4px; opacity: 0; transition: opacity .3s; text-align: center; max-width: 640px; }
+  #controls-hint { position: absolute; left: 16px; bottom: 12px; font-size: 12px; opacity: .65; }
+  #minimap { position: absolute; top: 84px; right: 16px; width: 180px; height: 180px; border-radius: 50%; border: 2px solid rgba(255,255,255,.7); background: rgba(0,0,0,.35); }
+  .screen { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(180deg, rgba(40,10,30,.82), rgba(20,8,20,.88)); pointer-events: auto; text-align: center; padding: 20px; }
+  .screen.hidden { display: none; }
+  .screen h1 { font-size: 84px; margin: 0; letter-spacing: 10px; color: #ffb37a; text-shadow: 0 4px 30px rgba(255,120,40,.6); }
+  .screen h2 { font-size: 30px; margin: 0 0 18px; letter-spacing: 6px; color: #ff4fa3; }
+  .story { max-width: 560px; font-size: 17px; line-height: 1.5; opacity: .95; }
+  .controls { font-size: 14px; line-height: 1.7; opacity: .85; }
+  .screen button { pointer-events: auto; margin-top: 22px; font-size: 20px; font-weight: 800; letter-spacing: 2px; padding: 14px 42px; border: none; border-radius: 4px; background: #ff4fa3; color: #fff; cursor: pointer; box-shadow: 0 4px 24px rgba(255,79,163,.5); }
+  .screen button:hover { background: #ff6cb3; }
+  .save-note { font-size: 13px; opacity: .75; margin-top: 14px; }
 </style>
+<script type="importmap">
+{ "imports": { "three": "./vendor/three.module.min.js" } }
+</script>
 </head>
 <body>
-<canvas id="game" aria-label="Block Dodger: move the paddle left and right to dodge falling blocks and catch coins"></canvas>
-<p id="status" role="status" aria-live="polite"></p>
+<div id="game"></div>
+<div id="ui"></div>
 <script type="module" src="./src/main.js"></script>
 </body>
 </html>
