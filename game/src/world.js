@@ -43,10 +43,11 @@ export function createWorld(scene, seed) {
   };
   buildCity(W, scene);
 
-  // Dario Cole on foot: dark jacket, distinct from peds.
+  // Dario Cole on foot: bright orange jacket, distinct from peds and
+  // readable in shadow (round 6: was near-black 0x2c2c34, a silhouette).
   // Spawn on the road (x=40), never inside a building block.
   const mesh = makePedMesh(W.rng);
-  mesh.children[0].material = new THREE.MeshLambertMaterial({ color: 0x2c2c34 });
+  mesh.children[0].material = new THREE.MeshLambertMaterial({ color: 0xe85d2a });
   W.player = {
     x: 40, z: 60, heading: Math.PI, hp: CFG.PLAYER_HP,
     cash: CFG.START_CASH, wanted: 0, heatTimer: 0, bustedTimer: 0,

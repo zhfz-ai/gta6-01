@@ -133,9 +133,11 @@ function setupStage(W, scene) {
     M.van = van;
     scene.add(van.mesh);
     for (let i = 0; i < 2; i++) {
+      // Round 6: rivals in bright gold / red so they read on the road
+      // instead of black-on-black (was 0x222222 for both).
       const r = createCar(W, {
         kind: 'rival', x: st.from[0] - 30 - i * 14, z: st.from[1] + 20 + i * 10,
-        heading: Math.PI / 2, color: 0x222222,
+        heading: Math.PI / 2, color: i === 0 ? 0xd8a13c : 0xc0392b,
       });
       r.hp = 60;
       r.ramCooldown = 0;

@@ -24,7 +24,9 @@ export function ensureWanted(W, n, reason) {
 }
 
 export function spawnCop(W, scene, x, z) {
-  const cop = createCar(W, { kind: 'police', x, z, heading: 0, color: 0x1a2a4a });
+  // Round 6: lighter navy so police cars read at small size (was
+  // 0x1a2a4a — a black blob against dark asphalt). White stripe stays.
+  const cop = createCar(W, { kind: 'police', x, z, heading: 0, color: 0x2e4a8a });
   cop.active = true;
   W.police.push(cop);
   scene.add(cop.mesh);
@@ -104,7 +106,7 @@ export function updatePolice(W, dt, scene) {
         x: bx - fz * side,
         z: bz + fx * side,
         heading: heading + Math.PI / 2,
-        color: 0x1a2a4a,
+        color: 0x2e4a8a,
       });
       cop.active = true;
       W.roadblock.cars.push(cop);

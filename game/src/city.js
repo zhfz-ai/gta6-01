@@ -12,9 +12,10 @@ function roadTexture() {
   const c = document.createElement('canvas');
   c.width = 64; c.height = 256;
   const g = c.getContext('2d');
-  g.fillStyle = '#3a3a40';
+  // Round 6: asphalt lightened so roads read as roads, not black voids.
+  g.fillStyle = '#5c5c62';
   g.fillRect(0, 0, 64, 256);
-  g.fillStyle = '#2f2f35';
+  g.fillStyle = '#4a4a50';
   g.fillRect(0, 0, 6, 256);
   g.fillRect(58, 0, 6, 256);
   g.fillStyle = '#d8b13c';
@@ -47,14 +48,15 @@ function groundTexture() {
   // Sand strip east of x=240.
   g.fillStyle = '#e8cf9a';
   g.fillRect(px(240), 0, (300 - 240) * 2, H);
-  // Roads: dark strips on every 0-mod-40 line.
-  g.fillStyle = '#333338';
+  // Roads: mid-grey strips on every 0-mod-40 line (round 6: was
+  // near-black #333338, which swallowed cars and peds at small size).
+  g.fillStyle = '#54545a';
   for (let v = -240; v <= 240; v += 40) {
     g.fillRect(px(v) - 10, 0, 20, H); // north-south road
     g.fillRect(0, pz(v) - 10, W, 20); // east-west road
   }
   // Boulevard at x=220: lighter, palm-lined avenue.
-  g.fillStyle = '#4a4640';
+  g.fillStyle = '#615a4c';
   g.fillRect(px(220) - 14, 0, 28, H);
   // Lane dashes.
   g.fillStyle = '#c9a227';
@@ -80,8 +82,10 @@ function facadeTexture() {
   const rng = mulberry32(7);
   for (let y = 8; y < 248; y += 16) {
     for (let x = 8; x < 120; x += 16) {
-      const lit = rng() < 0.45;
-      g.fillStyle = lit ? (rng() < 0.7 ? '#ffd98a' : '#9fd8ff') : '#20242e';
+      // Round 6: most windows lit and warm, so the towers glow at
+      // sunset instead of reading as dark slabs (was 45% lit).
+      const lit = rng() < 0.62;
+      g.fillStyle = lit ? (rng() < 0.75 ? '#ffd98a' : '#9fd8ff') : '#2c3444';
       g.fillRect(x, y, 10, 10);
     }
   }
@@ -105,10 +109,10 @@ export function buildCity(W, scene) {
   ground.receiveShadow = true;
   group.add(ground);
 
-  // Ocean: big blue plane east of the sand, gently animated in render.js.
+  // Ocean: bright turquoise, sunlit (round 6: was deep dark blue).
   const ocean = new THREE.Mesh(
     new THREE.PlaneGeometry(320, 520),
-    new THREE.MeshLambertMaterial({ color: 0x1f6f8b }),
+    new THREE.MeshLambertMaterial({ color: 0x2f8fb5 }),
   );
   ocean.rotation.x = -Math.PI / 2;
   ocean.position.set(280 + 160, -0.4, 0);
@@ -167,7 +171,7 @@ export function buildCity(W, scene) {
   // Club Solano: a distinct low wide building with a pink neon sign box.
   const club = new THREE.Mesh(
     new THREE.BoxGeometry(30, 14, 24),
-    new THREE.MeshLambertMaterial({ color: 0x7a2e5d, map: facade }),
+    new THREE.MeshLambertMaterial({ color: 0x8f3a70, map: facade }),
   );
   club.position.set(160, 7, 120);
   club.castShadow = true;
@@ -261,8 +265,10 @@ export function buildCity(W, scene) {
 }
 
 function downtownPalette() {
+  // Round 6: warm light facades — the instance colour multiplies the
+  // window texture, so dark palette entries turned whole towers black.
   return [
-    0x9aa3ad, 0x7d8a99, 0xb0a08a, 0x8a7f70, 0x6b7c8a,
-    0xc2b49a, 0x5d6b7a, 0xa8907a, 0x8a94a0, 0x746a5e,
+    0xc2b49a, 0xb0a08a, 0xd8c8a8, 0xa8907a, 0xb8a88e,
+    0xcbb894, 0x9aa3ad, 0xb5a58a, 0xc4a882, 0xa89878,
   ];
 }

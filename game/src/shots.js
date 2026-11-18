@@ -56,17 +56,18 @@ export function stageShot(W, scene, name) {
     p.wanted = 3;
     W.stats.bestWanted = 3;
     W.shotObjective = 'Lose the cops';
-    // Three cops posed behind: offsets x ±5, z -12/-19/-26.
-    const c1 = spawnCop(W, scene, 217, -52);
-    const c2 = spawnCop(W, scene, 227, -59);
-    const c3 = spawnCop(W, scene, 222, -66);
+    // Three cops posed behind, closer than round 5 so the 3rd car
+    // reads big with its lightbar (was z -52/-59/-66, too far/small).
+    const c1 = spawnCop(W, scene, 217, -50);
+    const c2 = spawnCop(W, scene, 227, -55);
+    const c3 = spawnCop(W, scene, 222, -60);
     c1.heading = 0; c2.heading = 0; c3.heading = 0;
     c1.speed = 24; c2.speed = 24; c3.speed = 24;
     // Roadblock across the boulevard behind the chase (visible in
     // frame beyond the cops): two static police cars, sideways.
     // They are NOT in W.police, so nothing steps them — they just sit.
     for (const bx of [216, 224]) {
-      const block = createCar(W, { kind: 'police', x: bx, z: -80, heading: Math.PI / 2, color: 0x1a2a4a });
+      const block = createCar(W, { kind: 'police', x: bx, z: -72, heading: Math.PI / 2, color: 0x2e4a8a });
       block.active = true;
       scene.add(block.mesh);
     }
@@ -80,13 +81,13 @@ export function stageShot(W, scene, name) {
       c.route = { x: c.x, z: c.z + 40 };
       c.mesh.position.set(c.x, 0, c.z);
     });
-    W.peds.slice(0, 4).forEach((pd, i) => {
+    W.peds.slice(0, 6).forEach((pd, i) => {
       pd.x = i % 2 === 0 ? 211 : 229;
-      pd.z = -55 - i * 13;
+      pd.z = -48 - i * 11;
       pd.mesh.position.set(pd.x, 0, pd.z);
     });
     scarePeds(W, 222, -40, 45);
-    W.camOverride = { yaw: Math.PI + 0.3, pitch: 0.32, dist: 14 };
+    W.camOverride = { yaw: Math.PI + 0.3, pitch: 0.36, dist: 12 };
     W.shotSteps = 150;
     W.shotKind = 'drive';
     W.shotLane = 222;
@@ -103,11 +104,11 @@ export function stageShot(W, scene, name) {
     p.car = car;
     p.mesh.visible = false;
     // Clear traffic off the route x=-40, z -170..-30, then re-stage
-    // five traffic cars ahead on the same road (visible up the avenue)
+    // eight traffic cars ahead on the same road (visible up the avenue)
     // and six peds on the sidewalks near the player.
     clearTrafficRect(W, -50, -170, -30, -30);
-    const routeCars = W.traffic.slice(0, 5);
-    const routeSpots = [[-42.6, -70], [-37.4, -100], [-42.6, -130], [-37.4, -160], [-42.6, -190]];
+    const routeCars = W.traffic.slice(0, 8);
+    const routeSpots = [[-42.6, -60], [-37.4, -85], [-42.6, -110], [-37.4, -135], [-42.6, -160], [-37.4, -185], [-42.6, -210], [-37.4, -235]];
     routeCars.forEach((c, i) => {
       c.x = routeSpots[i][0];
       c.z = routeSpots[i][1];
@@ -116,32 +117,50 @@ export function stageShot(W, scene, name) {
       c.route = { x: -40, z: c.z - 40 };
       c.mesh.position.set(c.x, 0, c.z);
     });
+    // Cross-street traffic on the z=-120 avenue, so the frame shows a
+    // live intersection mid-distance instead of an empty road.
+    const crossCars = W.traffic.slice(8, 11);
+    const crossSpots = [[-90, -120, Math.PI / 2, -50], [-10, -120, -Math.PI / 2, -50], [30, -120, Math.PI / 2, 70]];
+    crossCars.forEach((c, i) => {
+      c.x = crossSpots[i][0];
+      c.z = crossSpots[i][1];
+      c.heading = crossSpots[i][2];
+      c.cruise = 12;
+      c.route = { x: crossSpots[i][3], z: -120 };
+      c.mesh.position.set(c.x, 0, c.z);
+    });
     W.peds.slice(3, 9).forEach((pd, i) => {
       pd.x = i % 2 === 0 ? -47 : -33;
       pd.z = -55 - i * 15;
       pd.mesh.position.set(pd.x, 0, pd.z);
     });
     W.shotObjective = 'Cruise downtown — find your next job';
-    W.camOverride = { yaw: Math.PI, pitch: 0.33, dist: 13 };
+    W.camOverride = { yaw: Math.PI, pitch: 0.36, dist: 12 };
     W.shotSteps = 120;
     W.shotKind = 'drive';
     W.shotLane = -40;
     W.shotBaseHeading = Math.PI;
   } else if (name === 'foot') {
     // On foot: pistol standoff by a car, peds fleeing, wanted 1.
-    // Dario faces the car he is about to steal (east-south of him).
-    p.x = 206; p.z = 30; p.heading = 1.0;
+    // Round 6: Dario at a 3/4 FRONT angle — the camera sits on the
+    // side he faces, looking back at him, so his orange jacket and
+    // front read instead of a back silhouette (round 5 shot from
+    // behind him). The car he is about to steal sits to his
+    // front-left, far enough from the camera to read whole: in the
+    // first round-6 take it was 3 units from the lens and filled a
+    // corner as a black slab.
+    p.x = 206; p.z = 30; p.heading = 0.8;
     p.mesh.position.set(p.x, 0, p.z);
     p.hasPistol = true;
     p.ammo = CFG.PISTOL_AMMO;
     const car = W.parked.find((c) => Math.abs(c.x - 216) < 2) || W.parked[0];
-    car.x = 212; car.z = 34; car.heading = Math.PI / 2;
+    car.x = 212; car.z = 26; car.heading = Math.PI / 2;
     car.mesh.position.set(car.x, 0, car.z);
     // A second parked car across the road, and a traffic car passing
     // on the road behind Dario, so the frame reads as a live street.
     const car2 = W.parked.find((c) => c !== car) || null;
     if (car2) {
-      car2.x = 198; car2.z = 44; car2.heading = Math.PI / 2;
+      car2.x = 196; car2.z = 26; car2.heading = Math.PI / 2;
       car2.mesh.position.set(car2.x, 0, car2.z);
     }
     const passer = W.traffic[0];
@@ -158,39 +177,51 @@ export function stageShot(W, scene, name) {
     p.wanted = 1;
     W.stats.bestWanted = 1;
     W.missions.objective = 'Steal a car — walk up to one and press E';
-    W.camOverride = { yaw: p.heading, pitch: 0.28, dist: 6.5 };
+    // Camera in front of Dario (his heading + PI), offset 0.5 rad so
+    // it is a 3/4 front view, not dead-on.
+    W.camOverride = { yaw: p.heading + Math.PI - 0.5, pitch: 0.3, dist: 7.5 };
     W.shotSteps = 90;
     W.shotKind = 'idle';
   } else if (name === 'mission') {
     // Mission start at the club: objective text, skyline + beach behind.
     // The escort van + both rival hunters are pulled up close to Dario
-    // so the frame shows the whole beat: white van ahead, black rivals
-    // flanking it, pink marker pillar at Club Solano beyond.
+    // so the frame shows the whole beat: white van ahead, gold/red
+    // rivals flanking it (round 6: bright rivals, were black-on-black).
+    // Round 6 camera: pulled back (dist 22) and nearly level (pitch
+    // 0.12), looking north — the pink marker pillar rises ABOVE the
+    // club roof into the sky instead of being hidden behind the club
+    // with only a sliver at the frame top (round 5: dist 11, pitch
+    // 0.28, pillar top out of frame). Rivals sit clear of the club's
+    // south face; peds are on the road, not inside the club plot.
     startMission(W, scene, 3); // Solano's Cut, stage 0 — marker = club
     // Everyone stands ON the x=160 road (block centres are 20 mod 40,
     // so x=148 would put Dario inside a building's footprint).
-    p.x = 160; p.z = 154; p.heading = Math.PI;
+    p.x = 160; p.z = 158; p.heading = Math.PI;
     p.mesh.position.set(p.x, 0, p.z);
     const van = W.missions.van;
     if (van) {
-      van.x = 160; van.z = 140; van.heading = Math.PI;
+      van.x = 160; van.z = 142; van.heading = Math.PI;
       van.waypoints = [[160, 120]];
       van.wpIndex = 0;
       van.mesh.position.set(van.x, 0, van.z);
     }
     W.missions.rivals.forEach((r, i) => {
-      r.x = i === 0 ? 156 : 164;
-      r.z = i === 0 ? 130 : 134;
+      r.x = i === 0 ? 155 : 165;
+      r.z = i === 0 ? 138 : 140;
       r.heading = Math.PI;
       r.mesh.position.set(r.x, 0, r.z);
     });
     W.peds.slice(0, 3).forEach((pd, i) => {
-      pd.x = [153, 167, 154][i];
-      pd.z = [128, 132, 118][i];
+      pd.x = [153, 167, 156][i];
+      pd.z = [146, 148, 152][i];
       pd.mesh.position.set(pd.x, 0, pd.z);
     });
-    // Look NORTH toward the club (camYaw is the look direction here).
-    W.camOverride = { yaw: Math.PI - 0.1, pitch: 0.28, dist: 11 };
+    // Look NORTH toward the club (camYaw is the look direction here),
+    // slightly angled so the pillar stands off-centre against the sky.
+    // Yaw offset kept small (0.12): a bigger offset pushed the camera
+    // off the road against the (140,160) block's wall, which filled
+    // the left of the frame.
+    W.camOverride = { yaw: Math.PI - 0.12, pitch: 0.15, dist: 17 };
     W.shotSteps = 60;
     W.shotKind = 'idle';
   } else {
