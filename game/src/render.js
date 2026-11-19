@@ -12,7 +12,8 @@ export function setupRenderer() {
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFShadowMap;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.3;
+  // Round 7: exposure up so the sunset reads bright, not murky.
+  renderer.toneMappingExposure = 1.45;
   document.getElementById('game').appendChild(renderer.domElement);
   return renderer;
 }
@@ -24,8 +25,10 @@ export function setupScene() {
 
   // Sunset: warm sun higher in the west (-x) than round 5, so building
   // shadows stay short and the roads read bright instead of black.
-  const sun = new THREE.DirectionalLight(0xffb37a, 3.0);
-  sun.position.set(-160, 150, 60);
+  // Round 7: sun stronger and higher still, hemisphere up — the r6b
+  // roads still photographed dark brown in the foreground.
+  const sun = new THREE.DirectionalLight(0xffb37a, 3.2);
+  sun.position.set(-160, 170, 60);
   sun.castShadow = true;
   sun.shadow.mapSize.set(1024, 1024);
   sun.shadow.camera.left = -260;
@@ -35,7 +38,7 @@ export function setupScene() {
   sun.shadow.camera.far = 700;
   sun.shadow.bias = -0.0004;
   scene.add(sun);
-  scene.add(new THREE.HemisphereLight(0xffd9b0, 0x8a7a5e, 1.7));
+  scene.add(new THREE.HemisphereLight(0xffd9b0, 0x9a8a6e, 2.0));
 
   // Sun disc on the western horizon.
   const disc = new THREE.Mesh(

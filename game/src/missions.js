@@ -53,13 +53,15 @@ const STORY = [
 
 export function initMissions(W, scene) {
   // Objective beacon: tall translucent pillar + ground ring.
+  // Round 7: thicker, taller, more opaque — the r6b pillar was a thin
+  // pale stripe at the top of the mission shot, barely legible.
   const mat = new THREE.MeshBasicMaterial({
-    color: 0xff4fa3, transparent: true, opacity: 0.35, side: THREE.DoubleSide,
+    color: 0xff4fa3, transparent: true, opacity: 0.55, side: THREE.DoubleSide,
   });
-  const pillar = new THREE.Mesh(new THREE.CylinderGeometry(2.2, 2.2, 34, 12, 1, true), mat);
-  pillar.position.y = 17;
+  const pillar = new THREE.Mesh(new THREE.CylinderGeometry(3.4, 3.4, 40, 12, 1, true), mat);
+  pillar.position.y = 20;
   const ring = new THREE.Mesh(
-    new THREE.RingGeometry(2.6, 3.6, 24),
+    new THREE.RingGeometry(3.8, 5.0, 24),
     new THREE.MeshBasicMaterial({ color: 0xff4fa3, transparent: true, opacity: 0.8, side: THREE.DoubleSide }),
   );
   ring.rotation.x = -Math.PI / 2;

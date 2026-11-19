@@ -40,11 +40,13 @@ export function makeCarMesh(color, isPolice = false) {
     g.add(t);
   }
   if (isPolice) {
+    // Round 7: bar wider and taller so it reads as a lightbar at
+    // screenshot distance (was 1.2 x 0.18 — a blue smudge).
     const bar = new THREE.Mesh(
-      new THREE.BoxGeometry(1.2, 0.18, 0.4),
+      new THREE.BoxGeometry(1.5, 0.24, 0.4),
       new THREE.MeshBasicMaterial({ color: 0x2244ff }),
     );
-    bar.position.set(0, 1.45, -0.2);
+    bar.position.set(0, 1.48, -0.2);
     bar.name = 'lightbar';
     g.add(bar);
     const stripe = new THREE.Mesh(
@@ -84,6 +86,9 @@ export function createCar(W, opts) {
     airborne: false,
     ramCooldown: 0,
     mesh: makeCarMesh(opts.color ?? 0xc0392b, opts.kind === 'police'),
+    // Round 7: keep the paint colour on the object so staging can pick
+    // a bright car for a passing role instead of a black slab.
+    color: opts.color ?? 0xc0392b,
     active: true,
     route: null,
     cruise: CFG.TRAFFIC_SPEED,

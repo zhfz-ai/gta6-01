@@ -13,9 +13,10 @@ function roadTexture() {
   c.width = 64; c.height = 256;
   const g = c.getContext('2d');
   // Round 6: asphalt lightened so roads read as roads, not black voids.
-  g.fillStyle = '#5c5c62';
+  // Round 7: lighter again — r6b still photographed dark brown.
+  g.fillStyle = '#6f6f75';
   g.fillRect(0, 0, 64, 256);
-  g.fillStyle = '#4a4a50';
+  g.fillStyle = '#5b5b61';
   g.fillRect(0, 0, 6, 256);
   g.fillRect(58, 0, 6, 256);
   g.fillStyle = '#d8b13c';
@@ -49,14 +50,15 @@ function groundTexture() {
   g.fillStyle = '#e8cf9a';
   g.fillRect(px(240), 0, (300 - 240) * 2, H);
   // Roads: mid-grey strips on every 0-mod-40 line (round 6: was
-  // near-black #333338, which swallowed cars and peds at small size).
-  g.fillStyle = '#54545a';
+  // near-black #333338, which swallowed cars and peds at small size;
+  // round 7: lighter again, r6b roads still read dark brown).
+  g.fillStyle = '#69696f';
   for (let v = -240; v <= 240; v += 40) {
     g.fillRect(px(v) - 10, 0, 20, H); // north-south road
     g.fillRect(0, pz(v) - 10, W, 20); // east-west road
   }
   // Boulevard at x=220: lighter, palm-lined avenue.
-  g.fillStyle = '#615a4c';
+  g.fillStyle = '#7e7566';
   g.fillRect(px(220) - 14, 0, 28, H);
   // Lane dashes.
   g.fillStyle = '#c9a227';
